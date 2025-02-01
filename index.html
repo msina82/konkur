@@ -7,35 +7,68 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap');
 
+        :root {
+            --primary-color: #2ecc71;
+            --secondary-color: #3498db;
+            --bg-color: #0a0a0a;
+            --container-bg: #111111;
+            --text-color: #ffffff;
+            --border-color: #2ecc7120;
+            --hover-bg: #2ecc710d;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f8f9fa;
+            --container-bg: #ffffff;
+            --text-color: #2c3e50;
+            --border-color: #e9ecef;
+            --hover-bg: #e9f8f0;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Vazirmatn', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         body {
-            background: #0a0a0a;
+            background: var(--bg-color);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            color: var(--text-color);
         }
 
         .container {
-            background: #111111;
+            background: var(--container-bg);
             padding: 2rem;
             border-radius: 20px;
             box-shadow: 0 0 40px rgba(46, 204, 113, 0.1);
             width: 95%;
             max-width: 1400px;
-            border: 1px solid #2ecc7120;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            padding: 5px;
         }
 
         h1 {
             text-align: center;
-            color: #2ecc71;
+            color: var(--primary-color);
             margin-bottom: 2rem;
             font-size: 2.2rem;
             position: relative;
@@ -51,7 +84,7 @@
             transform: translateX(-50%);
             width: 120px;
             height: 3px;
-            background: linear-gradient(90deg, transparent, #2ecc71, transparent);
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
             border-radius: 2px;
         }
 
@@ -59,18 +92,18 @@
             overflow-x: auto;
             margin: 20px 0;
             border-radius: 15px;
-            border: 1px solid #2ecc7120;
+            border: 1px solid var(--border-color);
         }
 
         table {
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            background: #111111;
+            background: var(--container-bg);
         }
 
         th {
-            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            background: linear-gradient(45deg, var(--primary-color), #27ae60);
             color: #000;
             padding: 1.5rem;
             font-weight: 700;
@@ -84,43 +117,46 @@
         td {
             padding: 1.2rem;
             text-align: center;
-            color: #fff;
-            border-bottom: 1px solid #2ecc7120;
-            transition: all 0.3s ease;
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
         }
 
         tr:not(:first-child) {
-            background: linear-gradient(90deg, #1a1a1a 50%, #111 100%);
+            background: linear-gradient(
+                90deg, 
+                color-mix(in srgb, var(--container-bg) 90%, #000 10%),
+                var(--container-bg)
+            );
         }
 
         tr:hover td {
-            background: #2ecc710d;
+            background: var(--hover-bg);
         }
 
         td:nth-child(4),
         td:nth-child(8) {
-            background: #e67e2220;
+            background: color-mix(in srgb, #e67e22 20%, transparent 80%);
             color: #e67e22;
             font-weight: 700;
         }
 
         td:nth-child(9) {
-            background: #9b59b620;
+            background: color-mix(in srgb, #9b59b6 20%, transparent 80%);
             color: #9b59b6;
             font-weight: 700;
         }
 
         td:first-child {
-            background: #3498db20;
-            color: #3498db;
+            background: color-mix(in srgb, var(--secondary-color) 20%, transparent 80%);
+            color: var(--secondary-color);
             font-weight: 700;
-            border-left: 3px solid #3498db;
+            border-left: 3px solid var(--secondary-color);
         }
 
         .btn-toggle {
             background: transparent;
-            color: #2ecc71;
-            border: 2px solid #2ecc71;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
             padding: 1rem 2rem;
             border-radius: 10px;
             font-size: 1.1rem;
@@ -130,15 +166,12 @@
             max-width: 300px;
             margin: 1.5rem auto;
             display: block;
-            position: relative;
-            overflow: hidden;
         }
 
         .btn-toggle:hover {
-            background: #2ecc71;
+            background: var(--primary-color);
             color: #000;
-            text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            box-shadow: 0 0 25px #2ecc71;
+            box-shadow: 0 0 25px var(--primary-color);
         }
 
         @media (max-width: 768px) {
@@ -169,6 +202,7 @@
 </head>
 <body>
     <div class="container">
+        <button class="theme-toggle" id="themeToggle">🌓</button>
         <h1>⏳ برنامه مطالعه کنکور هوشمند</h1>
         <div class="table-wrapper">
             <table>
@@ -254,6 +288,31 @@
     </div>
 
     <script>
+        // سیستم تغییر تم
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            body.setAttribute('data-theme', savedTheme);
+            themeToggle.textContent = savedTheme === 'dark' ? '🌙' : '🌞';
+        }
+
+        function toggleTheme() {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            body.setAttribute('data-theme', newTheme);
+            themeToggle.textContent = newTheme === 'dark' ? '🌙' : '🌞';
+            localStorage.setItem('theme', newTheme);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            themeToggle.addEventListener('click', toggleTheme);
+        });
+
+        // سیستم نوتیفیکیشن
         let lastNotification = null;
         let notificationTimeout = null;
         const timePattern = /(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/;
@@ -348,6 +407,7 @@
             checkTime();
         });
 
+        // سیستم نمایش/پنهان کردن جدول
         document.getElementById('toggleBtn').addEventListener('click', function() {
             const tableWrapper = document.querySelector('.table-wrapper');
             if (tableWrapper.style.display === 'none') {
@@ -360,47 +420,6 @@
                 }, 450);
             }
         });
-      
-      function checkTime() {
-    if(notificationTimeout) return;
-    
-    const now = new Date();
-    const currentDay = getPersianDay(now.getDay());
-    const currentTime = now.getHours() * 60 + now.getMinutes();
-
-    const schedule = extractSchedule();
-    const todaySchedule = schedule[currentDay];
-    
-    if(!todaySchedule) return;
-
-    todaySchedule.forEach(item => {
-        const match = item.time.match(timePattern);
-        if(!match) return;
-
-        const startHour = parseInt(match[1]);
-        const startMinute = parseInt(match[2]);
-        const endHour = parseInt(match[3]);
-        const endMinute = parseInt(match[4]);
-
-        const startTime = startHour * 60 + startMinute;
-        const endTime = endHour * 60 + endMinute;
-
-        if(currentTime >= startTime && currentTime < endTime && now.getSeconds() === 0){
-            if(lastNotification !== item.subject){
-                sendNotification(`⏰ زمان مطالعه: ${item.subject}`, {
-                    body: `ساعت ${match[1]}:${match[2]} تا ${match[3]}:${match[4]}`,
-                    icon: '/notification-icon.png'
-                });
-                lastNotification = item.subject;
-            }
-        }
-    });
-
-    notificationTimeout = setTimeout(() => {
-        notificationTimeout = null;
-    }, 1000);
-}
-
     </script>
 </body>
 </html>
