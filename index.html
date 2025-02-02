@@ -121,27 +121,33 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        tr:not(:first-child) {
-            background: linear-gradient(
-                90deg, 
-                color-mix(in srgb, var(--container-bg) 90%, #000 10%),
-                var(--container-bg)
-            );
+        .day-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .digital-clock {
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-shadow: 0 0 5px rgba(46, 204, 113, 0.5);
         }
 
         tr:hover td {
             background: var(--hover-bg);
         }
 
-        td:nth-child(4),
-        td:nth-child(6),
+        td:nth-child(5),
         td:nth-child(9) {
             background: color-mix(in srgb, #e67e22 20%, transparent 80%);
             color: #e67e22;
             font-weight: 700;
         }
 
-        td:nth-child(5) {
+        td:nth-child(8),
+        td:nth-child(10) {
             background: color-mix(in srgb, #9b59b6 20%, transparent 80%);
             color: #9b59b6;
             font-weight: 700;
@@ -188,6 +194,10 @@
             h1 {
                 font-size: 1.8rem;
             }
+
+            .digital-clock {
+                font-size: 0.9rem;
+            }
         }
 
         @keyframes fadeIn {
@@ -211,11 +221,11 @@
                     <tr>
                         <th>روز</th>
                         <th>9:00 - 10:00</th>
-                        <th>10:10 - 11:10</th>
-                        <th>11:20 - 12:00</th>
-                        <th>12:00 - 14:30</th>
-                        <th>14:30 - 15:00</th>
-                        <th>15:00 - 16:00</th>
+                        <th>10:00 - 11:00</th>
+                        <th>11:00 - 12:15</th>
+                        <th>12:15 - 14:30</th>
+                        <th>14:30 - 15:30</th>
+                        <th>15:30 - 16:00</th>
                         <th>16:00 - 19:00</th>
                         <th>19:00 - 20:00</th>
                         <th>20:00 - 22:00</th>
@@ -223,63 +233,88 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>شنبه</td>
+                        <td>
+                            <div class="day-cell">
+                                شنبه
+                                <div class="digital-clock">00:00:00</div>
+                            </div>
+                        </td>
                         <td>عربی</td>
                         <td>دین و زندگی</td>
                         <td>ریاضی</td>
-                        <td>وقت غذا 🍽️</td>
-                        <td>استراحت ☕</td>
+                        <td>🍲 وقت غذا</td>
                         <td>فارسی</td>
+                        <td>زبان انگلیسی</td>
                         <td>برنامه‌نویسی</td>
-                        <td>شام 🌙</td>
+                        <td>🍽️ شام</td>
                         <td>برنامه‌نویسی با هوش مصنوعی</td>
                     </tr>
                     <tr>
-                        <td>یکشنبه</td>
+                        <td>
+                            <div class="day-cell">
+                                یک‌شنبه
+                                <div class="digital-clock">00:00:00</div>
+                            </div>
+                        </td>
                         <td>علوم فنون</td>
                         <td>فلسفه</td>
                         <td>روان‌شناسی</td>
-                        <td>وقت غذا 🍽️</td>
-                        <td>استراحت ☕</td>
+                        <td>🍲 وقت غذا</td>
                         <td>جامعه‌شناسی</td>
+                        <td>زبان انگلیسی</td>
                         <td>برنامه‌نویسی</td>
-                        <td>شام 🌙</td>
+                        <td>🍽️ شام</td>
                         <td>برنامه‌نویسی با هوش مصنوعی</td>
                     </tr>
                     <tr>
-                        <td>دوشنبه</td>
+                        <td>
+                            <div class="day-cell">
+                                دوشنبه
+                                <div class="digital-clock">00:00:00</div>
+                            </div>
+                        </td>
                         <td>جغرافیا</td>
                         <td>عربی</td>
                         <td>دین و زندگی</td>
-                        <td>وقت غذا 🍽️</td>
-                        <td>استراحت ☕</td>
+                        <td>🍲 وقت غذا</td>
                         <td>ریاضی</td>
-                        <td>برنامه‌نویسی</td>
-                        <td>شام 🌙</td>
-                        <td>برنامه‌نویسی با هوش مصنوعی</td>
-                    </tr>
-                    <tr>
-                        <td>سه‌شنبه</td>
-                        <td>تاریخ</td>
-                        <td>علوم فنون</td>
-                        <td>فلسفه</td>
-                        <td>وقت غذا 🍽️</td>
-                        <td>استراحت ☕</td>
-                        <td>روان‌شناسی</td>
-                        <td>برنامه‌نویسی</td>
-                        <td>شام 🌙</td>
-                        <td>برنامه‌نویسی با هوش مصنوعی</td>
-                    </tr>
-                    <tr>
-                        <td>چهارشنبه</td>
-                        <td>مرور ریاضی</td>
-                        <td>مرور ریاضی</td>
-                        <td>مرور نکات</td>
-                        <td>وقت غذا 🍽️</td>
-                        <td>استراحت ☕</td>
                         <td>زبان انگلیسی</td>
                         <td>برنامه‌نویسی</td>
-                        <td>شام 🌙</td>
+                        <td>🍽️ شام</td>
+                        <td>برنامه‌نویسی با هوش مصنوعی</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="day-cell">
+                                سه‌شنبه
+                                <div class="digital-clock">00:00:00</div>
+                            </div>
+                        </td>
+                        <td>تاریخ</td>
+                        <td>علوم فنون</td>
+                        <td>زبان انگلیسی</td>
+                        <td>🍲 وقت غذا</td>
+                        <td>روان‌شناسی</td>
+                        <td>مرور نکات</td>
+                        <td>برنامه‌نویسی</td>
+                        <td>🍽️ شام</td>
+                        <td>برنامه‌نویسی با هوش مصنوعی</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="day-cell">
+                                چهارشنبه
+                                <div class="digital-clock">00:00:00</div>
+                            </div>
+                        </td>
+                        <td>مرور ریاضی</td>
+                        <td>مرور ریاضی</td>
+                        <td>مرور ریاضی</td>
+                        <td>🍲 وقت غذا</td>
+                        <td>زبان انگلیسی</td>
+                        <td>مرور نکات</td>
+                        <td>برنامه‌نویسی</td>
+                        <td>🍽️ شام</td>
                         <td>برنامه‌نویسی با هوش مصنوعی</td>
                     </tr>
                 </tbody>
@@ -289,6 +324,25 @@
     </div>
 
     <script>
+        // به‌روزرسانی ساعت‌های دیجیتال
+        function updateClocks() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const timeString = `${hours}:${minutes}:${seconds}`;
+            
+            document.querySelectorAll('.digital-clock').forEach(clock => {
+                clock.textContent = timeString;
+            });
+        }
+      
+      
+
+        // به‌روزرسانی ساعت هر ثانیه
+        setInterval(updateClocks, 1000);
+        updateClocks(); // اجرای اولیه
+
         // سیستم تغییر تم
         const themeToggle = document.getElementById('themeToggle');
         const body = document.body;
@@ -313,101 +367,6 @@
             themeToggle.addEventListener('click', toggleTheme);
         });
 
-        // سیستم نوتیفیکیشن
-        let lastNotification = null;
-        let notificationTimeout = null;
-        const timePattern = /(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/;
-
-        function requestNotificationPermission() {
-            if (Notification.permission === 'default') {
-                Notification.requestPermission().then(permission => {
-                    console.log('وضعیت مجوز:', permission);
-                });
-            }
-        }
-
-        function getPersianDay(dayIndex) {
-            const days = [
-                'یکشنبه', 'دوشنبه', 'سه‌شنبه', 
-                'چهارشنبه', 'پنجشنبه', 'جمعه', 'شنبه'
-            ];
-            return days[dayIndex];
-        }
-
-        function extractSchedule() {
-            const schedule = {};
-            const rows = document.querySelectorAll('tbody tr');
-            
-            rows.forEach(row => {
-                const cells = row.cells;
-                const day = cells[0].textContent.trim();
-                schedule[day] = [];
-                
-                for(let i=1; i<cells.length; i++){
-                    const timeHeader = document.querySelector(`th:nth-child(${i+1})`);
-                    if(!timeHeader) continue;
-                    
-                    const time = timeHeader.textContent.trim();
-                    const subject = cells[i].textContent.trim();
-                    schedule[day].push({time, subject});
-                }
-            });
-            
-            return schedule;
-        }
-
-        function checkTime() {
-            if(notificationTimeout) return;
-            
-            const now = new Date();
-            const currentDay = getPersianDay(now.getDay());
-            const currentTime = now.getHours() * 60 + now.getMinutes();
-
-            const schedule = extractSchedule();
-            const todaySchedule = schedule[currentDay];
-            
-            if(!todaySchedule) return;
-
-            todaySchedule.forEach(item => {
-                const match = item.time.match(timePattern);
-                if(!match) return;
-                
-                const startHour = parseInt(match[1]);
-                const startMinute = parseInt(match[2]);
-                const endHour = parseInt(match[3]);
-                const endMinute = parseInt(match[4]);
-                
-                const startTime = startHour * 60 + startMinute;
-                const endTime = endHour * 60 + endMinute;
-                
-                if(currentTime >= startTime && currentTime < endTime && now.getSeconds() === 0){
-                    if(lastNotification !== item.subject){
-                        sendNotification(`⏰ زمان مطالعه: ${item.subject}`, {
-                            body: `ساعت ${match[1]}:${match[2]} تا ${match[3]}:${match[4]}`,
-                            icon: '/notification-icon.png'
-                        });
-                        lastNotification = item.subject;
-                    }
-                }
-            });
-
-            notificationTimeout = setTimeout(() => {
-                notificationTimeout = null;
-            }, 1000);
-        }
-
-        function sendNotification(title, options) {
-            if (Notification.permission === 'granted') {
-                new Notification(title, options);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            requestNotificationPermission();
-            setInterval(checkTime, 1000);
-            checkTime();
-        });
-
         // سیستم نمایش/پنهان کردن جدول
         document.getElementById('toggleBtn').addEventListener('click', function() {
             const tableWrapper = document.querySelector('.table-wrapper');
@@ -423,4 +382,4 @@
         });
     </script>
 </body>
-</html>
+</html>   
