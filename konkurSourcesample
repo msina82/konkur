@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>برنامه مطالعه روزانه هوشمند</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #2ecc71;
+            --secondary-color: #3498db;
+            --bg-color: #0a0a0a;
+            --container-bg: #111111;
+            --text-color: #ffffff;
+            --border-color: #2ecc7120;
+            --hover-bg: #2ecc710d;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f8f9fa;
+            --container-bg: #ffffff;
+            --text-color: #2c3e50;
+            --border-color: #e9ecef;
+            --hover-bg: #e9f8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            background: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text-color);
+        }
+
+        .container {
+            background: var(--container-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(46, 204, 113, 0.1);
+            width: 95%;
+            max-width: 1400px;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            padding: 5px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            font-size: 2.2rem;
+            position: relative;
+            padding-bottom: 15px;
+            text-shadow: 0 0 15px rgba(46, 204, 113, 0.3);
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            border-radius: 2px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 20px 0;
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--container-bg);
+        }
+
+        th {
+            background: linear-gradient(45deg, var(--primary-color), #27ae60);
+            color: #000;
+            padding: 1.5rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            border: none;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            padding: 1.2rem;
+            text-align: center;
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .day-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .digital-clock {
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-shadow: 0 0 5px rgba(46, 204, 113, 0.5);
+        }
+
+        .active-day .digital-clock {
+            color: #e74c3c !important;
+            font-size: 1.2rem !important;
+            text-shadow: 0 0 10px rgba(231, 76, 60, 0.7) !important;
+            font-weight: bold;
+        }
+        
+        .active-day {
+            background: color-mix(in srgb, #e74c3c 10%, transparent 90%) !important;
+        }
+
+        tr:hover td {
+            background: var(--hover-bg);
+        }
+
+        td:nth-child(5),
+        td:nth-child(9) {
+            background: color-mix(in srgb, #e67e22 20%, transparent 80%);
+            color: #e67e22;
+            font-weight: 700;
+        }
+
+        td:nth-child(8),
+        td:nth-child(10) {
+            background: color-mix(in srgb, #9b59b6 20%, transparent 80%);
+            color: #9b59b6;
+            font-weight: 700;
+        }
+
+        td:first-child {
+            background: color-mix(in srgb, var(--secondary-color) 20%, transparent 80%);
+            color: var(--secondary-color);
+            font-weight: 700;
+            border-left: 3px solid var(--secondary-color);
+        }
+
+        .current-date {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        tr.hidden-day {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            th, td {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .digital-clock {
+                font-size: 0.9rem;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="theme-toggle" id="themeToggle">🌓</button>
+        <h1>⏳ برنامه مطالعه روزانه</h1>
+        <div class="current-date" id="currentDate">loading...</div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>روز</th>
+                        <th>9:00 - 10:00</th>
+                        <th>10:00 - 11:00</th>
+                        <th>11:00 - 12:15</th>
+                        <th>12:15 - 14:30</th>
+                        <th>14:30 - 15:30</th>
+                        <th>15:30 - 16:00</th>
+                        <th>16:00 - 19:00</th>
+                        <th>19:00 - 20:00</th>
+                        <th>20:00 - 22:00</th>
+                    </tr>
+                </thead>
+                <tbody id="scheduleBody">
+                    <tr>
+                        <td>
+                            <div class="day-cell">
+                                شنبه
+                                <div class="digital-clock">00:00:00</div>
+                            </div>
+                        </td>
+                        <td>عربی</td>
+                        <td>دین و زندگی</td>
+                        <td>ریاضی</td>
+                        <td>🍲 وقت غذا</td>
+                        <td>فارسی</td>
+                        <td>زبان انگلیسی</td>
+                        <td>برنامه‌نویسی</td>
+                        <td>🍽️ شام</td>
+                        <td>برنامه‌نویسی با هوش مصنوعی</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="day-cell">
+                                یک‌شنبه
+                                <div class="digital-clock">00:00:00</div>
+                            </div>
+                        </td>
+                        <td>علوم فنون</td>
+                        <td>فلسفه</td>
+                        <td>روان‌شناسی</td>
+                        <td>🍲 وقت غذا</td>
+                        <td>جامعه‌شناسی</td>
+                        <td>زبان انگلیسی</td>
+                        <td>برنامه‌نویسی</td>
+                        <td>🍽️ شام</td>
+                        <td>برنامه‌نویسی با هوش مصنوعی</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="day-cell">
+                                دوشنبه
+                                <div class="digital-clock">00:00:00</div>
+                            </div>
+                        </td>
+                        <td>جغرافیا</td>
+                        <td>عربی</td>
+                        <td>دین و زندگی</td>
+                        <td>🍲 وقت غذا</td>
+                        <td>ریاضی</td>
+                        <td>زبان انگلیسی</td>
+                        <td>برنامه‌نویسی</td>
+                        <td>🍽️ شام</td>
+                        <td>برنامه‌نویسی با هوش مصنوعی</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="day-cell">
+                                سه‌شنبه
+                                <div class="digital-clock">00:00:00</div>
+                            </div>
+                        </td>
+                        <td>تاریخ</td>
+                        <td>علوم فنون</td>
+                        <td>زبان انگلیسی</td>
+                        <td>🍲 وقت غذا</td>
+                        <td>روان‌شناسی</td>
+                        <td>مرور نکات</td>
+                        <td>برنامه‌نویسی</td>
+                        <td>🍽️ شام</td>
+                        <td>برنامه‌نویسی با هوش مصنوعی</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="day-cell">
+                                چهارشنبه
+                                <div class="digital-clock">00:00:00</div>
+                            </div>
+                        </td>
+                        <td>مرور ریاضی</td>
+                        <td>مرور ریاضی</td>
+                        <td>مرور ریاضی</td>
+                        <td>🍲 وقت غذا</td>
+                        <td>زبان انگلیسی</td>
+                        <td>مرور نکات</td>
+                        <td>برنامه‌نویسی</td>
+                        <td>🍽️ شام</td>
+                        <td>برنامه‌نویسی با هوش مصنوعی</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+       // تابع تشخیص روز هفته به فارسی
+        function getPersianWeekday() {
+            const tehranTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" });
+            const tehranDate = new Date(tehranTime);
+            const weekdays = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه', 'شنبه'];
+            return weekdays[tehranDate.getDay()];
+        }
+
+        // تابع فرمت‌بندی تاریخ فارسی
+        function getPersianDate() {
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                timeZone: 'Asia/Tehran'
+            };
+            return new Date().toLocaleDateString('fa-IR', options);
+        }
+
+        // به‌روزرسانی ساعت و برنامه روز
+        function updateSchedule() {
+            const tehranTime = new Date().toLocaleString("en-US", { 
+                timeZone: "Asia/Tehran",
+                hour12: false
+            });
+            const tehranDate = new Date(tehranTime);
+            
+            // به‌روزرسانی ساعت
+            const hours = String(tehranDate.getHours()).padStart(2, '0');
+            const minutes = String(tehranDate.getMinutes()).padStart(2, '0');
+            const seconds = String(tehranDate.getSeconds()).padStart(2, '0');
+            const timeString = `${hours}:${minutes}:${seconds}`;
+            
+            // به‌روزرسانی تاریخ
+            document.getElementById('currentDate').textContent = getPersianDate();
+            
+            // نمایش برنامه روز جاری
+            const currentDay = getPersianWeekday();
+            document.querySelectorAll('tbody tr').forEach(row => {
+                const dayCell = row.querySelector('.day-cell');
+                const dayText = dayCell.textContent.trim().split('\n')[0];
+                const clock = dayCell.querySelector('.digital-clock');
+                
+                if (dayText === currentDay) {
+                    row.classList.remove('hidden-day');
+                    clock.style.display = 'block';
+                    clock.textContent = timeString;
+                    row.querySelector('td:first-child').classList.add('active-day');
+                } else {
+                    row.classList.add('hidden-day');
+                    clock.style.display = 'none';
+                    row.querySelector('td:first-child').classList.remove('active-day');
+                }
+            });
+        }
+
+        // به‌روزرسانی هر ثانیه
+        setInterval(updateSchedule, 1000);
+        updateSchedule(); // اجرای اولیه
+
+        // سیستم تغییر تم
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            body.setAttribute('data-theme', savedTheme);
+            themeToggle.textContent = savedTheme === 'dark' ? '🌙' : '🌞';
+        }
+
+        function toggleTheme() {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', newTheme);
+            themeToggle.textContent = newTheme === 'dark' ? '🌙' : '🌞';
+            localStorage.setItem('theme', newTheme);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            themeToggle.addEventListener('click', toggleTheme);
+        });
+    </script>
+</body>
+</html>
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>برنامه مطالعه روزانه هوشمند</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #2ecc71;
+            --secondary-color: #3498db;
+            --bg-color: #0a0a0a;
+            --container-bg: #111111;
+            --text-color: #ffffff;
+            --border-color: #2ecc7120;
+            --hover-bg: #2ecc710d;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f8f9fa;
+            --container-bg: #ffffff;
+            --text-color: #2c3e50;
+            --border-color: #e9ecef;
+            --hover-bg: #e9f8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            background: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text-color);
+        }
+
+        .container {
+            background: var(--container-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(46, 204, 113, 0.1);
+            width: 95%;
+            max-width: 1400px;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            padding: 5px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            font-size: 2.2rem;
+            position: relative;
+            padding-bottom: 15px;
+            text-shadow: 0 0 15px rgba(46, 204, 113, 0.3);
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            border-radius: 2px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 20px 0;
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--container-bg);
+        }
+
+        th {
+            background: linear-gradient(45deg, var(--primary-color), #27ae60);
+            color: #000;
+            padding: 1.5rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            border: none;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            padding: 1.2rem;
+            text-align: center;
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .day-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .day-name {
+            font-weight: 700;
+        }
+
+        .digital-clock {
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-shadow: 0 0 5px rgba(46, 204, 113, 0.5);
+            display: none;
+        }
+
+        .active-day {
+            background: color-mix(in srgb, #e74c3c 10%, transparent 90%) !important;
+        }
+
+        .active-day .digital-clock {
+            display: block !important;
+            color: #e74c3c !important;
+            font-size: 1.2rem !important;
+            text-shadow: 0 0 10px rgba(231, 76, 60, 0.7) !important;
+        }
+
+        tr:hover td {
+            background: var(--hover-bg);
+        }
+
+        td:nth-child(5),
+        td:nth-child(9) {
+            background: color-mix(in srgb, #e67e22 20%, transparent 80%);
+            color: #e67e22;
+            font-weight: 700;
+        }
+
+        td:nth-child(8),
+        td:nth-child(10) {
+            background: color-mix(in srgb, #9b59b6 20%, transparent 80%);
+            color: #9b59b6;
+            font-weight: 700;
+        }
+
+        td:first-child {
+            background: color-mix(in srgb, var(--secondary-color) 20%, transparent 80%);
+            color: var(--secondary-color);
+            font-weight: 700;
+            border-left: 3px solid var(--secondary-color);
+        }
+
+        .date-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .current-date {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .countdown {
+            color: #e74c3c;
+            font-weight: bold;
+            background: rgba(231, 76, 60, 0.1);
+            padding: 8px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(231, 76, 60, 0.2);
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            th, td {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .digital-clock {
+                font-size: 0.9rem;
+            }
+
+            .date-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="theme-toggle" id="themeToggle">🌓</button>
+        <h1>⏳ برنامه مطالعه روزانه</h1>
+        <div class="date-container">
+            <div class="current-date" id="currentDate"></div>
+            <div class="countdown" id="countdown"></div>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>روز</th>
+                        <th>9:00 - 10:00</th>
+                        <th>10:00 - 11:00</th>
+                        <th>11:00 - 12:15</th>
+                        <th>12:15 - 14:30</th>
+                        <th>14:30 - 15:30</th>
+                        <th>15:30 - 16:00</th>
+                        <th>16:00 - 19:00</th>
+                        <th>19:00 - 20:00</th>
+                        <th>20:00 - 22:00</th>
+                    </tr>
+                </thead>
+                <tbody id="scheduleBody">
+                    <tr>
+                        <td>
+                            <div class="day-cell">
+                                <span class="day-name">شنبه</span>
+                                <div class="digital-clock"></div>
+                            </div>
+                        </td>
+                        <td>عربی</td>
+                        <td>دین و زندگی</td>
+                        <td>ریاضی</td>
+                        <td>🍲 وقت غذا</td>
+                        <td>فارسی</td>
+                        <td>زبان انگلیسی</td>
+                        <td>برنامه‌نویسی</td>
+                        <td>🍽️ شام</td>
+                        <td>برنامه‌نویسی با هوش مصنوعی</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="day-cell">
+                                <span class="day-name">یک‌شنبه</span>
+                                <div class="digital-clock"></div>
+                            </div>
+                        </td>
+                        <td>علوم فنون</td>
+                        <td>فلسفه</td>
+                        <td>روان‌شناسی</td>
+                        <td>🍲 وقت غذا</td>
+                        <td>جامعه‌شناسی</td>
+                        <td>زبان انگلیسی</td>
+                        <td>برنامه‌نویسی</td>
+                        <td>🍽️ شام</td>
+                        <td>برنامه‌نویسی با هوش مصنوعی</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="day-cell">
+                                <span class="day-name">دوشنبه</span>
+                                <div class="digital-clock"></div>
+                            </div>
+                        </td>
+                        <td>جغرافیا</td>
+                        <td>عربی</td>
+                        <td>دین و زندگی</td>
+                        <td>🍲 وقت غذا</td>
+                        <td>ریاضی</td>
+                        <td>زبان انگلیسی</td>
+                        <td>برنامه‌نویسی</td>
+                        <td>🍽️ شام</td>
+                        <td>برنامه‌نویسی با هوش مصنوعی</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="day-cell">
+                                <span class="day-name">سه‌شنبه</span>
+                                <div class="digital-clock"></div>
+                            </div>
+                        </td>
+                        <td>تاریخ</td>
+                        <td>علوم فنون</td>
+                        <td>زبان انگلیسی</td>
+                        <td>🍲 وقت غذا</td>
+                        <td>روان‌شناسی</td>
+                        <td>مرور نکات</td>
+                        <td>برنامه‌نویسی</td>
+                        <td>🍽️ شام</td>
+                        <td>برنامه‌نویسی با هوش مصنوعی</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="day-cell">
+                                <span class="day-name">چهارشنبه</span>
+                                <div class="digital-clock"></div>
+                            </div>
+                        </td>
+                        <td>مرور ریاضی</td>
+                        <td>مرور ریاضی</td>
+                        <td>مرور ریاضی</td>
+                        <td>🍲 وقت غذا</td>
+                        <td>زبان انگلیسی</td>
+                        <td>مرور نکات</td>
+                        <td>برنامه‌نویسی</td>
+                        <td>🍽️ شام</td>
+                        <td>برنامه‌نویسی با هوش مصنوعی</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // توابع تاریخ و زمان
+        function getPersianWeekday() {
+            const weekdays = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه', 'شنبه'];
+            const tehranDate = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Tehran"}));
+            return weekdays[tehranDate.getDay()];
+        }
+
+        function getPersianDate() {
+            return new Date().toLocaleDateString('fa-IR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                timeZone: 'Asia/Tehran'
+            });
+        }
+
+        function calculateCountdown() {
+            const targetDate = new Date('2025-09-23T00:00:00+03:30');
+            const now = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Tehran"}));
+            const diff = targetDate - now;
+
+            if (diff <= 0) return '🎉 زمان مورد نظر رسیده است!';
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            return `${days} روز و ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} تا اول مهر`;
+        }
+
+        // سیستم به روزرسانی خودکار
+        function updateDisplay() {
+            // به روزرسانی تاریخ و ساعت
+            document.getElementById('currentDate').textContent = getPersianDate();
+            document.getElementById('countdown').textContent = calculateCountdown();
+
+            // به روزرسانی جدول برنامه
+            const currentDay = getPersianWeekday();
+            document.querySelectorAll('#scheduleBody tr').forEach(row => {
+                const dayName = row.querySelector('.day-name').textContent.trim();
+                const clock = row.querySelector('.digital-clock');
+                
+                if (dayName === currentDay) {
+                    row.classList.add('active-day');
+                    const tehranTime = new Date().toLocaleTimeString('fa-IR', {timeZone: "Asia/Tehran"});
+                    clock.textContent = tehranTime;
+                } else {
+                    row.classList.remove('active-day');
+                }
+            });
+        }
+
+        // سیستم تغییر تم
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.setAttribute('data-theme', savedTheme);
+            document.getElementById('themeToggle').textContent = savedTheme === 'dark' ? '🌙' : '🌞';
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            document.getElementById('themeToggle').textContent = newTheme === 'dark' ? '🌙' : '🌞';
+        }
+
+        // راه اندازی اولیه
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            setInterval(updateDisplay, 1000);
+            updateDisplay();
+        });
+    </script>
+</body>
+</html>
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>برنامه مطالعه روزانه هوشمند</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #2ecc71;
+            --secondary-color: #3498db;
+            --bg-color: #0a0a0a;
+            --container-bg: #111111;
+            --text-color: #ffffff;
+            --border-color: #2ecc7120;
+            --hover-bg: #2ecc710d;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f8f9fa;
+            --container-bg: #ffffff;
+            --text-color: #2c3e50;
+            --border-color: #e9ecef;
+            --hover-bg: #e9f8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            background: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text-color);
+        }
+
+        .container {
+            background: var(--container-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(46, 204, 113, 0.1);
+            width: 95%;
+            max-width: 1400px;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            padding: 5px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            font-size: 2.2rem;
+            position: relative;
+            padding-bottom: 15px;
+            text-shadow: 0 0 15px rgba(46, 204, 113, 0.3);
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            border-radius: 2px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 20px 0;
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--container-bg);
+        }
+
+        th {
+            background: linear-gradient(45deg, var(--primary-color), #27ae60);
+            color: #000;
+            padding: 1.5rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            border: none;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            padding: 1.2rem;
+            text-align: center;
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .day-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .digital-clock {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #e74c3c;
+            text-shadow: 0 0 10px rgba(231, 76, 60, 0.7);
+        }
+
+        .date-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .current-date {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            th, td {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .digital-clock {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="theme-toggle" id="themeToggle">🌓</button>
+        <h1>⏳ برنامه مطالعه روزانه</h1>
+        <div class="date-container">
+            <div class="current-date" id="currentDate"></div>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>روز</th>
+                        <th>9:00 - 10:00</th>
+                        <th>10:00 - 11:00</th>
+                        <th>11:00 - 12:15</th>
+                        <th>12:15 - 14:30</th>
+                        <th>14:30 - 15:30</th>
+                        <th>15:30 - 16:00</th>
+                        <th>16:00 - 19:00</th>
+                        <th>19:00 - 20:00</th>
+                        <th>20:00 - 22:00</th>
+                    </tr>
+                </thead>
+                <tbody id="scheduleBody">
+                    <!-- برنامه به صورت پویا در اینجا نمایش داده میشود -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // داده‌های برنامه هفتگی
+        const weeklySchedule = {
+            'شنبه': [
+                'عربی',
+                'دین و زندگی',
+                'ریاضی',
+                '🍲 وقت غذا',
+                'فارسی',
+                'زبان انگلیسی',
+                'برنامه‌نویسی',
+                '🍽️ شام',
+                'برنامه‌نویسی با هوش مصنوعی'
+            ],
+            'یک‌شنبه': [
+                'علوم فنون',
+                'فلسفه',
+                'روان‌شناسی',
+                '🍲 وقت غذا',
+                'جامعه‌شناسی',
+                'زبان انگلیسی',
+                'برنامه‌نویسی',
+                '🍽️ شام',
+                'برنامه‌نویسی با هوش مصنوعی'
+            ],
+            'دوشنبه': [
+                'جغرافیا',
+                'عربی',
+                'دین و زندگی',
+                '🍲 وقت غذا',
+                'ریاضی',
+                'زبان انگلیسی',
+                'برنامه‌نویسی',
+                '🍽️ شام',
+                'برنامه‌نویسی با هوش مصنوعی'
+            ],
+            'سه‌شنبه': [
+                'تاریخ',
+                'علوم فنون',
+                'زبان انگلیسی',
+                '🍲 وقت غذا',
+                'روان‌شناسی',
+                'مرور نکات',
+                'برنامه‌نویسی',
+                '🍽️ شام',
+                'برنامه‌نویسی با هوش مصنوعی'
+            ],
+            'چهارشنبه': [
+                'مرور ریاضی',
+                'مرور ریاضی',
+                'مرور ریاضی',
+                '🍲 وقت غذا',
+                'زبان انگلیسی',
+                'مرور نکات',
+                'برنامه‌نویسی',
+                '🍽️ شام',
+                'برنامه‌نویسی با هوش مصنوعی'
+            ]
+        };
+
+        // توابع زمان و تاریخ
+        function getTehranTime() {
+            return new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Tehran"}));
+        }
+
+        function getPersianWeekday() {
+            const weekdays = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه', 'شنبه'];
+            return weekdays[getTehranTime().getDay()];
+        }
+
+        function getPersianDate() {
+            return new Date().toLocaleDateString('fa-IR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                timeZone: 'Asia/Tehran'
+            });
+        }
+
+        // تولید برنامه روز جاری
+        function generateDailySchedule() {
+            const today = getPersianWeekday();
+            const scheduleBody = document.getElementById('scheduleBody');
+            
+            const row = document.createElement('tr');
+            
+            // سلول روز و ساعت
+            const dayCell = document.createElement('td');
+            dayCell.className = 'day-cell';
+            dayCell.innerHTML = `
+                <span>${today}</span>
+                <div class="digital-clock">${getTehranTime().toLocaleTimeString('fa-IR')}</div>
+            `;
+            row.appendChild(dayCell);
+
+            // سلول‌های برنامه
+            weeklySchedule[today].forEach(subject => {
+                const cell = document.createElement('td');
+                cell.textContent = subject;
+                row.appendChild(cell);
+            });
+
+            scheduleBody.innerHTML = '';
+            scheduleBody.appendChild(row);
+        }
+
+        // سیستم به روزرسانی خودکار
+        function updateDisplay() {
+            // به روزرسانی تاریخ
+            document.getElementById('currentDate').textContent = getPersianDate();
+            
+            // به روزرسانی برنامه و ساعت
+            generateDailySchedule();
+        }
+
+        // سیستم تغییر تم
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.setAttribute('data-theme', savedTheme);
+            document.getElementById('themeToggle').textContent = savedTheme === 'dark' ? '🌙' : '🌞';
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            document.getElementById('themeToggle').textContent = newTheme === 'dark' ? '🌙' : '🌞';
+        }
+
+        // راه اندازی اولیه
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            
+            // به روزرسانی اولیه
+            updateDisplay();
+            
+            // تنظیم زمان‌بند برای به روزرسانی هر ثانیه
+            setInterval(updateDisplay, 1000);
+            
+            // بررسی تغییر روز هر دقیقه
+            setInterval(() => {
+                const currentDay = getPersianWeekday();
+                if (currentDay !== document.querySelector('.day-cell span')?.textContent) {
+                    updateDisplay();
+                }
+            }, 60000);
+        });
+    </script>
+</body>
+</html>
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>برنامه مطالعه کنکور</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #2ecc71;
+            --secondary-color: #3498db;
+            --exam-color: #e74c3c;
+            --bg-color: #0a0a0a;
+            --container-bg: #111111;
+            --text-color: #ffffff;
+            --border-color: #2ecc7120;
+            --hover-bg: #2ecc710d;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f8f9fa;
+            --container-bg: #ffffff;
+            --text-color: #2c3e50;
+            --border-color: #e9ecef;
+            --hover-bg: #e9f8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            background: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text-color);
+        }
+
+        .container {
+            background: var(--container-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(46, 204, 113, 0.1);
+            width: 95%;
+            max-width: 1400px;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            padding: 5px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            font-size: 2.2rem;
+            position: relative;
+            padding-bottom: 15px;
+            text-shadow: 0 0 15px rgba(46, 204, 113, 0.3);
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            border-radius: 2px;
+        }
+
+        .date-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .current-date {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            text-align: center;
+            min-width: 300px;
+        }
+
+        .countdown-box {
+            background: rgba(231, 76, 60, 0.1);
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            text-align: center;
+            min-width: 240px;
+            margin: 0 10px;
+        }
+
+        .countdown-title {
+            color: var(--exam-color);
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+        }
+
+        .countdown-time {
+            color: var(--exam-color);
+            font-size: 1.1rem;
+            font-weight: 700;
+            direction: ltr;
+            letter-spacing: 1px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 20px 0;
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: fixed;
+            border-spacing: 0;
+            background: var(--container-bg);
+            table-layout: fixed;
+        }
+
+        th {
+            background: linear-gradient(45deg, var(--primary-color), #27ae60);
+            color: #000;
+            padding: 1.2rem;
+            font-weight: 700;
+            font-size: 1rem;
+            text-transform: uppercase;
+            border: none;
+            position: sticky;
+            top: 0;
+            width: 9%;
+        }
+
+        th:first-child {
+            width: 12%;
+        }
+
+        td {
+            padding: 1rem;
+            text-align: center;
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .digital-clock {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--exam-color);
+            text-shadow: 0 0 10px rgba(231, 76, 60, 0.7);
+            min-width: 80px;
+            display: inline-block;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .countdown-box {
+                padding: 8px 16px;
+                min-width: 200px;
+                margin: 5px 0;
+            }
+
+            .countdown-title {
+                font-size: 0.85rem;
+            }
+
+            .countdown-time {
+                font-size: 1rem;
+            }
+
+            th, td {
+                padding: 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .digital-clock {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="theme-toggle" id="themeToggle">🌓</button>
+        <h1>⏳ برنامه مطالعاتی کنکور</h1>
+        <div class="date-container">
+            <div class="current-date" id="currentDate"></div>
+            <div class="countdown-box">
+                <div class="countdown-title">زمان باقی مانده تا کنکور</div>
+                <div class="countdown-time" id="konkurCountdown"></div>
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>روز</th>
+                        <th>9-10</th>
+                        <th>10-11</th>
+                        <th>11-12:15</th>
+                        <th>12:15-14:30</th>
+                        <th>14:30-15:30</th>
+                        <th>15:30-16</th>
+                        <th>16-19</th>
+                        <th>19-20</th>
+                        <th>20-22</th>
+                    </tr>
+                </thead>
+                <tbody id="scheduleBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const KONKUR_DATE = new Date('2025-06-21T08:00:00+03:30');
+        const weeklySchedule = {
+            'شنبه': ['عربی', 'دین و زندگی', 'ریاضی', '🍲 غذا', 'فارسی', 'زبان', 'برنامه‌نویسی', '🍽️ شام', 'هوش مصنوعی'],
+            'یک‌شنبه': ['علوم فنون', 'فلسفه', 'روان‌شناسی', '🍲 غذا', 'جامعه‌شناسی', 'زبان', 'برنامه‌نویسی', '🍽️ شام', 'هوش مصنوعی'],
+            'دوشنبه': ['جغرافیا', 'عربی', 'دین و زندگی', '🍲 غذا', 'ریاضی', 'زبان', 'برنامه‌نویسی', '🍽️ شام', 'هوش مصنوعی'],
+            'سه‌شنبه': ['تاریخ', 'علوم فنون', 'زبان', '🍲 غذا', 'روان‌شناسی', 'مرور', 'برنامه‌نویسی', '🍽️ شام', 'هوش مصنوعی'],
+            'چهارشنبه': ['مرور ریاضی', 'مرور ریاضی', 'مرور ریاضی', '🍲 غذا', 'زبان', 'مرور', 'برنامه‌نویسی', '🍽️ شام', 'هوش مصنوعی']
+        };
+
+        let manualTheme = false;
+
+        function getTehranTime() {
+            return new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Tehran"}));
+        }
+
+        function getPersianWeekday() {
+            const weekdays = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه', 'شنبه'];
+            return weekdays[getTehranTime().getDay()];
+        }
+
+        function getPersianDate() {
+            return new Date().toLocaleDateString('fa-IR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                timeZone: 'Asia/Tehran'
+            });
+        }
+
+        function calculateKonkurCountdown() {
+            const now = getTehranTime();
+            const diff = KONKUR_DATE - now;
+            if(diff <= 0) return '🎉 زمان کنکور فرا رسیده است!';
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            return `${days} روز - ${String(hours).padStart(2, '۰')}:${String(minutes).padStart(2, '۰')}:${String(seconds).padStart(2, '۰')}`;
+        }
+
+        function generateDailySchedule() {
+            const today = getPersianWeekday();
+            const scheduleBody = document.getElementById('scheduleBody');
+            const row = document.createElement('tr');
+            
+            const dayCell = document.createElement('td');
+            dayCell.innerHTML = `
+                <div>${today}</div>
+                <div class="digital-clock">${getTehranTime().toLocaleTimeString('fa-IR')}</div>
+            `;
+            row.appendChild(dayCell);
+
+            weeklySchedule[today].forEach(subject => {
+                const cell = document.createElement('td');
+                cell.textContent = subject;
+                row.appendChild(cell);
+            });
+
+            scheduleBody.innerHTML = '';
+            scheduleBody.appendChild(row);
+        }
+
+        function updateTheme() {
+            const currentHour = getTehranTime().getHours();
+            if(!manualTheme) {
+                if(currentHour >= 7 && currentHour < 18) {
+                    document.body.setAttribute('data-theme', 'light');
+                } else {
+                    document.body.setAttribute('data-theme', 'dark');
+                }
+            }
+            document.getElementById('themeToggle').textContent = 
+                document.body.getAttribute('data-theme') === 'dark' ? '🌙' : '🌞';
+        }
+
+        function toggleTheme() {
+            manualTheme = true;
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            document.getElementById('themeToggle').textContent = newTheme === 'dark' ? '🌙' : '🌞';
+        }
+
+        function updateDisplay() {
+            document.getElementById('currentDate').textContent = getPersianDate();
+            document.getElementById('konkurCountdown').textContent = calculateKonkurCountdown();
+            generateDailySchedule();
+            updateTheme();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if(savedTheme) {
+                manualTheme = true;
+                document.body.setAttribute('data-theme', savedTheme);
+            }
+            
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            updateDisplay();
+            setInterval(updateDisplay, 1000);
+            setInterval(updateTheme, 60000);
+        });
+    </script>
+</body>
+</html>
