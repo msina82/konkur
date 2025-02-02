@@ -274,8 +274,11 @@
 
         let manualTheme = false;
 
+        // تابع اصلاح شده برای دریافت دقیق زمان تهران
         function getTehranTime() {
-            return new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Tehran"}));
+            const now = new Date();
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            return new Date(utc + (210 * 60000)); // افزودن 3:30 ساعت به UTC
         }
 
         function getPersianWeekday() {
@@ -284,13 +287,14 @@
         }
 
         function getPersianDate() {
-            return new Date().toLocaleDateString('fa-IR', {
+            const options = {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
                 timeZone: 'Asia/Tehran'
-            });
+            };
+            return new Intl.DateTimeFormat('fa-IR', options).format(getTehranTime());
         }
 
         function calculateKonkurCountdown() {
@@ -315,7 +319,12 @@
             const dayCell = document.createElement('td');
             dayCell.innerHTML = `
                 <div>${today}</div>
-                <div class="digital-clock">${getTehranTime().toLocaleTimeString('fa-IR')}</div>
+                <div class="digital-clock">${getTehranTime().toLocaleTimeString('fa-IR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    timeZone: 'Asia/Tehran'
+                })}</div>
             `;
             row.appendChild(dayCell);
 
